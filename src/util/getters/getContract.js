@@ -1,5 +1,5 @@
 import Web3 from 'web3'
-import {address, ABI} from '../constants/rollupNCContract'
+import {address, ABI} from '../constants/contract'
 
 // let web3 = new Web3(window.web3.currentProvider)
 // var getContract = new web3.eth.Contract(ABI, address)
@@ -14,9 +14,8 @@ let getContract = new Promise(function (resolve, reject) {
     let web3 = new Web3(window.web3.currentProvider, null, options)
 
     // console.log(web3)
-    const rollupNCContractInstance = new web3.eth.Contract(ABI, address)
-    // console.log('rollupNCContractInstance', rollupNCContractInstance)
-    resolve(rollupNCContractInstance)
+    const contractInstance = new web3.eth.Contract(ABI, address)
+    resolve(contractInstance)
 })
 
 export default getContract

@@ -1,10 +1,12 @@
 <template>
   <div class="eddsa-info" align="left">
-        <strong>EdDSA pubkey: </strong> <br/>
-        x: {{ pubkey.split(',')[0] }} <br/>
-        y: {{ pubkey.split(',')[1] }} <br/><br/>
-        <button @click="newWallet">Generate EdDSA wallet</button>
-        <button v-on:click="showPrivkey">Show EdDSA private key</button>        
+        <strong>identity: </strong> <br/>
+        pubkey_x: {{ pubkey.split(',')[0] }} <br/>
+        pubkey_y: {{ pubkey.split(',')[1] }} <br/>
+		identityTrapdoor: {{ identityTrapdoor }} <br/>
+		identityNullifier: {{ identityNullifier }} <br/><br/>
+        <button @click="newWallet">generate identity</button>
+        <button v-on:click="showPrivkey">show EdDSA private key</button>        
 
     </div>
     
@@ -30,22 +32,30 @@
         data () {
           return {
             pubkey: '',
-            privkey: ''
+			privkey: '',
+			identityNullifier: '',
+			identityTrapdoor: ''
           }
         },
         mounted () {
           if (localStorage.getItem('pubkey')) {
             this.pubkey = localStorage.getItem('pubkey')
-            this.privkey = localStorage.getItem('privkey')
+			this.privkey = localStorage.getItem('privkey')
+			this.identityNullifier = localStorage.getItem('identityNullifier')
+            this.identityTrapdoor = localStorage.getItem('identityTrapdoor')
           }
         },
         methods: {
           newWallet() {
             this.privkey = getAccount.generatePrvKey()
             console.log(this.privkey)
-            this.pubkey = getAccount.generatePubKey(this.privkey).toString()
+			this.pubkey = getAccount.generatePubKey(this.privkey).toString()
+			this.identityNullifier = getAccount.generateIdentityNullifier()
+			this.identityTrapdoor = getAccount.generateIdentityTrapdoor()
             localStorage.setItem('privkey', this.privkey)
-            localStorage.setItem('pubkey', this.pubkey.toString())
+			localStorage.setItem('pubkey', this.pubkey.toString())
+			localStorage.setItem('identityNullifier', this.identityNullifier)
+			localStorage.setItem('identityTrapdoor', this.identityTrapdoor)
           },
           showPrivkey() {
             alert(localStorage.privkey)

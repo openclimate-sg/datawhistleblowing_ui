@@ -2,18 +2,18 @@
     <div>
         <Metamask/><br/>
         <EdDSA/><br/>
-        <Deposit/><br/>
-        <Transfer/><br/>
-        <Withdraw/><br/><br/>
+        <Register/><br/>
+        <Report/><br/>
+        <Whistleblow/><br/><br/>
     </div>
 
 </template>
 
 <script>
     import Metamask from '@/components/Metamask'
-    import Deposit from '@/components/Deposit'
-    import Transfer from '@/components/Transfer'
-    import Withdraw from '@/components/Withdraw'
+    import Register from '@/components/Register'
+    import Report from '@/components/Report'
+    import Whistleblow from '@/components/Whistleblow'
     import EdDSA from '@/components/EdDSA'
     export default {
         name: 'RollupNC',
@@ -24,9 +24,9 @@
         components: {
             'Metamask': Metamask,
             'EdDSA': EdDSA,
-            'Deposit': Deposit,
-            'Transfer': Transfer,
-            'Withdraw': Withdraw
+            'Register': Register,
+            'Report': Report,
+            'Whistleblow': Whistleblow
         }
     }
 </script>
