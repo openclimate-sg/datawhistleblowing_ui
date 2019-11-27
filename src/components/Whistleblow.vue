@@ -1,7 +1,7 @@
 <template>
  <div class='withdraw-info' v-on:click="toggleHidden">
      <h1 align="center"><strong>blow whistle</strong></h1>
-     <b-container fluid v-if="!isHidden" v-on:click="toggleHidden">
+     <b-container fluid v-if="!isHidden">
         <b-row class="my-1">
             <b-col sm="2">
             <label for="input-small">from_x:</label><br/>
@@ -120,15 +120,17 @@
 <script>
     var websnark = require('@/util/libraries/websnark.js')
     var whistleHelper = require('@/util/helpers/whistleHelper.js')
-    // const circuit = require('@/util/constants/circuit.json')
-    const axios = require('axios')
+	const axios = require('axios')
+	const provingKeyURL = "https://oneofus.blob.core.windows.net/snarks/proving_key.bin"
+	const circuitURL = "https://oneofus.blob.core.windows.net/snarks/circuit.json"
 
     export default {
         name: 'Whistleblow',
         mounted () {
             // console.log('dispatching getContractInstance')
             this.$store.dispatch('getContractInstance')
-            this.loadProvingKey()
+			this.loadProvingKey()
+			this.loadCircuit()
             // this.loadWitness()
         },
         data () {
@@ -139,22 +141,20 @@
                 pendingEvent: false,
                 withdrawEvent: null,
                 withdrawTx: null,
-                from_x: "5188413625993601883297433934250988745151922355819390722918528461123462745458",
-                from_y: "12688531930957923993246507021135702202363596171614725698211865710242486568828",
-                nonce: 0,
-                amount: 500,
-                token_type_from: 10,
-                proof: [
-                    "8342813455761320245860753246541064453130959347426759535493956280345855081934",
-                    "13262889801219401015313652374233039919049275140584211861348878621716455310933"
-                ],
-                position: [1, 0],
-                txRoot: "149126198147162084281232535967801344773039936115368629187002798446712412021",
-                recipient: "0xC33Bdb8051D6d2002c0D80A1Dd23A1c9d9FC26E4",
+                from_x: "",
+                from_y: "",
+                nonce: "",
+                amount: "",
+                token_type_from: "",
+                proof: [],
+                position: [],
+                txRoot: "",
+                recipient: "",
                 a: null,
                 b: null,
                 c: null,
-                
+				
+				circuit: null,
                 provingKey: null,
                 witness: null,
                 privkey: Buffer.from("2".padStart(64,'0'), "hex"),
@@ -165,11 +165,20 @@
 
         methods: {
             loadProvingKey () {
-                fetch("http://raw.githubusercontent.com/therealyingtong/rollupnc_ui/master/src/assets/proving_key.bin")
+                fetch(provingKeyURL)
                 .then( (response) => {
                     return response.arrayBuffer();
                 }).then( (b) => {
                     this.provingKey = b;
+                })
+            },
+
+            loadCircuit () {
+                fetch(circuitURL)
+                .then( (response) => {
+                    return response.arrayBuffer();
+                }).then( (b) => {
+                    this.circuit = JSON.parse(b).toString();
                 })
             },
 
@@ -185,7 +194,7 @@
                 // var snarkInputs = whistleHelper.signWithdrawMessage(
                 //     this.nonce, this.recipient, [this.from_x, this.from_y], this.privkey
                 // )
-                // this.witness = whistleHelper.calculateWitness(circuit, snarkInputs)
+                // this.witness = whistleHelper.calculateWitness(this.circuit, snarkInputs)
                 // window.genZKSnarkProof(this.witness, this.provingKey).then((p)=> {
                 //     this.p = p
                 //     console.log(p)

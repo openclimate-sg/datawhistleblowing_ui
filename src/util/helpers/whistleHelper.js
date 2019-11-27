@@ -17,51 +17,57 @@ const mimcjs = require("@/circomlib/src/mimc7.js");
 const bigInt = snarkjs.bigInt;
 const buildWitness = require("../libraries/buildwitness")
 const {unstringifyBigInts} = require("../libraries/stringifybigint.js");
+const libsemaphore = require('libsemaphore')
+
+// import {
+//     SnarkProvingKey,
+//     SnarkVerifyingKey,
+//     parseVerifyingKeyJson,
+//     genExternalNullifier,
+//     genCircuit,
+//     Identity,
+//     genIdentity,
+//     genIdentityCommitment,
+//     genWitness,
+//     genProof,
+//     genPublicSignals,
+//     verifyProof,
+//     formatForVerifierContract,
+// } from 'libsemaphore'
 
 module.exports = {
 
-	blowWhistle: async function(contractInstance, identity, externalNullifier){
+	blowWhistle: async function(contractInstance, circuit, provingKey, WHISTLEBLOWER_REWARD_ADDRESS, identity, externalNullifier){
+		const semaphoreTreeDepth = 12
+		const signal = ''
 		const leaves = await contractInstance.getIdentityCommitments()
 
-	},
+		const result = await libsemaphore.genWitness(
+			signal,
+			circuit,
+			identity,
+			leaves,
+			semaphoreTreeDepth,
+			externalNullifier,
+		)
+	    let witness = result.witness
+		console.log('Generating zk-SNARK proof that the witness is part of the set of executives, but which does not reveal their identity...')
+		const proof = await libsemaphore.genProof(witness, provingKey)
+		const publicSignals = libsemaphore.genPublicSignals(witness, circuit)
+		// const isValid = verifyProof(verifyingKey, proof, publicSignals)
+		const formatted = libsemaphore.formatForVerifierContract(proof, publicSignals)
 
-    signWithdrawMessage: function(nonce, recipient, pubKey, prvKey){
-        var M = mimcjs.multiHash([nonce, bigInt(recipient)])
-        var signature = eddsa.signMiMC(prvKey, M);
-        const inputs = {
-            Ax: pubKey[0].toString(),
-            Ay: pubKey[1].toString(),
-            R8x: signature.R8[0].toString(),
-            R8y: signature.R8[1].toString(),
-            S: signature.S.toString(),
-            M: M.toString()
-        }
-        return inputs
-    },
-
-    generateCall: function(p){
-        proof =  unstringifyBigInts(p);
-        function p256(n) {
-            let nstr = n.toString(16);
-            while (nstr.length < 64) nstr = "0"+nstr;
-            nstr = "0x" + nstr;
-            return nstr;
-        }
-        const call = {
-            a: [p256(proof['pi_a'][0]), p256(proof["pi_a"][1])],
-            b: [[p256(proof["pi_b"][0][1]), p256(proof["pi_b"][0][0])],[
-                p256(proof["pi_b"][1][1]), p256(proof["pi_b"][1][0])]],
-            c: [p256(proof["pi_c"][0]), p256(proof["pi_c"][1])]
-        }
-        return call
-    },
-
-    calculateWitness: function(cirDef, inputs){
-        circuit = new snarkjs.Circuit(cirDef);
-        witness = circuit.calculateWitness(inputs);
-        witnessBin = buildWitness.buildWitness(witness)
-        return witnessBin
-    }
+		const whistleblowTx = await contractInstance.blowWhistle(
+			WHISTLEBLOWER_REWARD_ADDRESS,
+			ethers.utils.toUtf8Bytes(signal),
+			formatted.a,
+			formatted.b,
+			formatted.c,
+			formatted.input,
+		)
+		const receipt = await whistleblowTx.wait()
+		// return receipt
+	}
 
 }
 

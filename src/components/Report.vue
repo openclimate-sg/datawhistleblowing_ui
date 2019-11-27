@@ -1,7 +1,7 @@
 <template>
- <div class='register-info' v-on:click="toggleHidden">
+ <div class='register-info' >
      <h1 align="center"><strong>submit data</strong></h1>
-     <b-container fluid v-if="!isHidden" v-on:click="toggleHidden">
+     <b-container fluid v-if="!isHidden" >
         <b-row class="my-1">
             <b-col sm="2">
             <label for="input-large">data:</label><br/>
@@ -11,7 +11,7 @@
             </b-col>
         </b-row>
     </b-container>
-     <div class="register-button" v-if="!isHidden" v-on:click="toggleHidden">
+     <div class="register-button" v-if="!isHidden" >
         <h5 v-on:click = "clickRegister()"><strong>submit to contract</strong></h5>
      </div>
 	 dataHash: {{ dataHash }}
@@ -45,9 +45,9 @@
         white-space: wrap;
         /* width: 100%;                   IE6 needs any width */
         overflow: hidden;              /* "overflow" value must be different from  visible"*/ 
-        -o-text-overflow: ellipsis;    /* Opera < 11*/
-        text-overflow:    ellipsis; 
-		font-size: 90%
+        /* -o-text-overflow: ellipsis;    Opera < 11 */
+        /* text-overflow:    ellipsis;  */
+		font-size: 80%
     }
     .register-info:hover{
         background-color:#a8a857;
@@ -93,7 +93,7 @@
         },
         data () {
             return {
-                isHidden: true,
+                isHidden: false,
                 pendingTx: false,
                 pendingEvent: false,
                 registerEvent: null,

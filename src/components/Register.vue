@@ -17,7 +17,7 @@
             </b-col>
         </b-row>
     </b-container>
-     <div class="register-button" v-if="!isHidden" v-on:click="toggleHidden">
+     <div class="register-button" v-if="!isHidden" >
         <h5 v-on:click = "clickRegister()"><strong>submit to contract</strong></h5>
      </div>
     <div class="tx" v-if="registerTx" align = "left">
