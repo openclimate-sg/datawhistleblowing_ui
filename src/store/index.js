@@ -33,7 +33,6 @@ export const store = new Vuex.Store({
         },
 
         registerContractInstance (state, payload) {
-            // console.log('RollupNC contract instance: ', payload)
             state.contractInstance = () => payload
             // state.contractInstance = payload
         },

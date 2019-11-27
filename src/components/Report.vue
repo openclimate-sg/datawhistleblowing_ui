@@ -110,13 +110,13 @@
                 this.pendingEvent = true
                 this.pendingTx = true
 
-				var dataHash = reportHelper.genExternalNullifier(
+				this.dataHash = reportHelper.genExternalNullifier(
 					this.data
 				)
 				localStorage.setItem('dataHash', this.dataHash)
 
                 this.$store.state.contractInstance().methods.reportData(
-                    dataHash).send(
+                    this.dataHash).send(
                     {
 						// gas: 300000,
 						value: 100000000000000000,

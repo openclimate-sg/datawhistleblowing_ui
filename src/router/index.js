@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import RollupNC from '@/components/RollupNC'
+import PreciDatos from '@/components/PreciDatos'
 
 Vue.use(Router)
 
@@ -8,8 +8,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'RollupNC',
-      component: RollupNC
+      name: 'PreciDatos',
+      component: PreciDatos
     }
   ]
 })
