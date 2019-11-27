@@ -1,12 +1,12 @@
 <template>
   <div class="eddsa-info" align="left">
-        <strong>identity: </strong> <br/>
-        pubkey_x: {{ pubkey.split(',')[0] }} <br/>
-        pubkey_y: {{ pubkey.split(',')[1] }} <br/>
-		identityTrapdoor: {{ identityTrapdoor }} <br/>
-		identityNullifier: {{ identityNullifier }} <br/><br/>
+        <strong>identity: </strong> <br/><br/>
+        pubkey_x: <br/> {{ pubkey.split(',')[0] }} <br/>
+        pubkey_y: <br/> {{ pubkey.split(',')[1] }} <br/>
+		trapdoor: <br/> {{ identityTrapdoor }} <br/>
+		nullifier: <br/> {{ identityNullifier }} <br/><br/>
         <button @click="newWallet">generate identity</button>
-        <button v-on:click="showPrivkey">show EdDSA private key</button>        
+        <button v-on:click="showPrivkey">show private key</button>        
 
     </div>
     
@@ -15,13 +15,13 @@
 <style scoped>
 .eddsa-info {
   width: 100%;
-  padding-left: 20%; 
+  padding-left: 15%; 
   /* margin-left: -300px; */
   white-space: wrap;
-  /* width: 100%;                   IE6 needs any width */
   /* overflow: hidden;              /* "overflow" value must be different from  visible"*/ 
   /* -o-text-overflow: ellipsis;    Opera < 11 */
-  /* text-overflow:    ellipsis;   */
+  text-overflow:    ellipsis;
+  font-size: 79%  
 }
 </style>
 

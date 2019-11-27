@@ -72,18 +72,19 @@
         margin-top: 20px;
         margin-left: auto;
         margin-right: auto;
-        padding: 20px;
+        padding: 10px;
         /* display: inline-block; */
         text-align:left;
         border: 1px solid black;
         background-color:#c3c388; 
-        width: 60%;
+        width: 70%;
         /* padding-left: 10%;  */
         white-space: wrap;
         /* width: 100%;                   IE6 needs any width */
         overflow: hidden;              /* "overflow" value must be different from  visible"*/ 
         -o-text-overflow: ellipsis;    /* Opera < 11*/
         text-overflow:    ellipsis; 
+		font-size: 90%
     }
     .withdraw-info:hover{
         background-color:#a8a857;
