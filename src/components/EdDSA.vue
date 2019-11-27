@@ -1,8 +1,8 @@
 <template>
   <div class="eddsa-info" align="left">
         <strong>identity: </strong> <br/><br/>
-        pubkey_x: <br/> {{ pubkey.split(',')[0] }} <br/>
-        pubkey_y: <br/> {{ pubkey.split(',')[1] }} <br/>
+        pubkey_x: <br/> {{ pubkey.toString().split(',')[0] }} <br/>
+        pubkey_y: <br/> {{ pubkey.toString().split(',')[1] }} <br/>
 		trapdoor: <br/> {{ identityTrapdoor }} <br/>
 		nullifier: <br/> {{ identityNullifier }} <br/><br/>
         <button @click="newWallet">generate identity</button>
@@ -31,6 +31,7 @@
         name: 'EdDSA',
         data () {
           return {
+			identity: {},
             pubkey: '',
 			privkey: '',
 			identityNullifier: '',
@@ -39,6 +40,7 @@
         },
         mounted () {
           if (localStorage.getItem('pubkey')) {
+			this.identity = localStorage.getItem('identity')
             this.pubkey = localStorage.getItem('pubkey')
 			this.privkey = localStorage.getItem('privkey')
 			this.identityNullifier = localStorage.getItem('identityNullifier')
@@ -47,13 +49,15 @@
         },
         methods: {
           newWallet() {
-            this.privkey = getAccount.generatePrvKey()
-            console.log(this.privkey)
-			this.pubkey = getAccount.generatePubKey(this.privkey).toString()
-			this.identityNullifier = getAccount.generateIdentityNullifier()
-			this.identityTrapdoor = getAccount.generateIdentityTrapdoor()
-            localStorage.setItem('privkey', this.privkey)
-			localStorage.setItem('pubkey', this.pubkey.toString())
+			this.identity = getAccount.generateIdentity()
+			console.log('identity', this.identity)
+			this.pubkey = this.identity['keypair']['pubKey']
+			this.privkey = this.identity['keypair']['privKey'].toString('hex')
+			this.identityNullifier = this.identity['identityNullifier']
+			this.identityTrapdoor = this.identity['identityTrapdoor']
+			localStorage.setItem('identity', this.identity)
+			localStorage.setItem('privkey', this.privkey)
+			localStorage.setItem('pubkey', this.pubkey)
 			localStorage.setItem('identityNullifier', this.identityNullifier)
 			localStorage.setItem('identityTrapdoor', this.identityTrapdoor)
           },

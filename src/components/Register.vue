@@ -6,14 +6,14 @@
             <b-col sm="2">
             <label for="input-small">pubkey_x:</label><br/>
             <label for="input-small">pubkey_y:</label><br/>
+			<label for="input-small">trapdoor:</label><br/>
             <label for="input-small">nullifier:</label><br/>
-            <label for="input-small">trapdoor:</label><br/>
             </b-col>
             <b-col sm="10">
             <b-form-input id="input-small" v-model="pubkey_x" size="sm"></b-form-input>
             <b-form-input id="input-small" v-model="pubkey_y" size="sm"></b-form-input>
-            <b-form-input id="input-small" v-model="identityNullifier" size="sm"></b-form-input>
             <b-form-input id="input-small" v-model="identityTrapdoor" size="sm"></b-form-input>
+			<b-form-input id="input-small" v-model="identityNullifier" size="sm"></b-form-input>
             </b-col>
         </b-row>
     </b-container>

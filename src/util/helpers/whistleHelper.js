@@ -18,18 +18,19 @@ const bigInt = snarkjs.bigInt;
 const buildWitness = require("../libraries/buildwitness")
 const {unstringifyBigInts} = require("../libraries/stringifybigint.js");
 const libsemaphore = require('libsemaphore')
+const ethers = require('ethers')
 
 
 module.exports = {
 
 	formatIdentity: function(pubkey_x, pubkey_y, privKey, identityNullifier, identityTrapdoor){
 		return {
-			"keypair": {
-				"pubKey": [bigInt(pubkey_x), bigInt(pubkey_y)],
-				"privKey": Buffer.from(privKey)
+			keypair: {
+				pubKey: [BigInt(pubkey_x), BigInt(pubkey_y)],
+				privKey: Buffer.from(privKey, 'hex')
 			},
-			"identityNullifier": bigInt(identityNullifier),
-			"identityTrapdoor": bigInt(identityTrapdoor)
+			identityNullifier: BigInt(identityNullifier),
+			identityTrapdoor: BigInt(identityTrapdoor)
 		}
 	},
 
@@ -44,20 +45,23 @@ module.exports = {
 			identity,
 			leaves,
 			semaphoreTreeDepth,
-			externalNullifier,
+			bigInt(externalNullifier),
 		)
 	    let witness = result.witness
 		console.log('Generating zk-SNARK proof that the witness is part of the set of executives, but which does not reveal their identity...')
+		console.log('provingKey',provingKey)
 		const proof = await libsemaphore.genProof(witness, provingKey)
-		const publicSignals = libsemaphore.genPublicSignals(witness, circuit)
+		const publicSignals = await libsemaphore.genPublicSignals(witness, circuit)
 		// const isValid = verifyProof(verifyingKey, proof, publicSignals)
-		const formatted = libsemaphore.formatForVerifierContract(proof, publicSignals)
+		const formatted = await libsemaphore.formatForVerifierContract(proof, publicSignals)
 
-		return ethers.utils.toUtf8Bytes(signal),
+		console.log(formatted, signal)
+
+		return [ethers.utils.toUtf8Bytes(signal),
 		formatted.a,
 		formatted.b,
 		formatted.c,
-		formatted.input
+		formatted.input]
 	}
 
 }

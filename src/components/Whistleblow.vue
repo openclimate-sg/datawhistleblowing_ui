@@ -105,9 +105,6 @@
         mounted () {
             // console.log('dispatching getContractInstance')
             this.$store.dispatch('getContractInstance')
-			this.loadProvingKey()
-			this.loadCircuit()
-            // this.loadWitness()
         },
         data () {
             return {
@@ -124,75 +121,50 @@
 				privkey: localStorage.getItem('privkey'),
                 data_hash: "",
                 recipient: "",
-				circuit: null,
-                provingKey: null,
+				// circuit: null,
+                // provingKey: null,
                 p: null
             }	
         },
 
         methods: {
-            loadProvingKey () {
-                fetch(provingKeyURL)
-                .then( (response) => {
-                    return response.arrayBuffer();
-                }).then( (b) => {
-					this.provingKey = b;
-					console.log(this.provingKey)
-                })
+            async loadProvingKey () {
+                const response = await fetch(provingKeyURL)
+				const provingKey = new Uint8Array(await response.arrayBuffer());
+				return provingKey
             },
-            loadCircuit () {
-                fetch(circuitURL, {cache: 'no-store'})
-                .then( (response) => {
-                    return response.json();
-                }).then( (b) => {
-					console.log('hi', b)
-					this.circuit = b;
-                })
+            async loadCircuit () {
+                const response = await fetch(circuitURL, {cache: 'no-store'})
+				return response.json();
+
             },
 
             async clickWithdraw () {
-
-				this.pendingTx = true
-				const leaves = await this.$store.state.contractInstance().methods.getIdentityCommitments().call()
-					
-				await console.log(leaves)
+				var provingKey = await this.loadProvingKey()
+				var circuit = await this.loadCircuit()
+				var leaves = await this.$store.state.contractInstance().methods.getIdentityCommitments().call()
+				await console.log('leaves', leaves)
 				const identity = await whistleHelper.formatIdentity(this.pubkey_x, this.pubkey_y, this.privkey, this.nullifier, this.trapdoor)
-				await console.log(identity)
-				var signal, a, b, c, input = await whistleHelper.blowWhistle(
+				await console.log('identity', identity)
+				var inputs = await whistleHelper.blowWhistle(
 					leaves,
-					this.circuit,
-					this.provingKey,
+					circuit,
+					provingKey,
 					identity,
 					this.data_hash
 				)
 
-				await console.log('signal, a, b, c, input', signal, a, b, c, input)
+				await console.log('signal, a, b, c, input', inputs)
 
-                this.$store.state.contractInstance().methods.blowWhistle(
+                await this.$store.state.contractInstance().methods.blowWhistle(
 					this.recipient,
-					signal, a, b, c, input
+					inputs[0], inputs[1], inputs[2], inputs[3], inputs[4]
 					).send(
                     {
                         // gas: 300000,
                         from: this.$store.state.web3.coinbase
-                    }, 
-                    (err, result) => {
-                        if (err) {
-                            console.log(err)
-                        } else {
-                            this.pendingTx = false
-                            this.withdrawTx = result
-                            this.$store.state.contractInstance().events.Withdraw( 
-                                {fromBlock: 0, toBlock: 'latest'}, (error, event) => {}
-                            )
-                            .on('data', (event) => {
-                                this.withdrawEvent = event['returnValues']
-                                console.log(this.withdrawEvent)
-                                this.pendingEvent = true
-                            })
-                            .on('error', console.error)
-                        }
-                    })
+                    }
+                    )
             },
 
 
