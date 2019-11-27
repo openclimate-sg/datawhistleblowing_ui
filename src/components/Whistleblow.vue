@@ -23,7 +23,6 @@
             </b-col>
         </b-row>
     </b-container>
-     {{ p }}
     
     <div class="withdraw-button" v-if="!isHidden" >
         <h5 v-on:click = "clickWithdraw"><strong> submit to contract</strong></h5>
@@ -104,7 +103,12 @@
         name: 'Whistleblow',
         mounted () {
             // console.log('dispatching getContractInstance')
-            this.$store.dispatch('getContractInstance')
+			this.$store.dispatch('getContractInstance')
+			this.pubkey_x = localStorage.getItem('pubkey').toString().split(',')[0],
+			this.pubkey_y = localStorage.getItem('pubkey').toString().split(',')[1],
+			this.nullifier = localStorage.getItem('identityNullifier'),
+			this.trapdoor = localStorage.getItem('identityTrapdoor'),
+			this.privkey = localStorage.getItem('privkey')
         },
         data () {
             return {
@@ -114,16 +118,15 @@
                 pendingEvent: false,
                 withdrawEvent: null,
                 withdrawTx: null,
-                pubkey_x: localStorage.getItem('pubkey').split(',')[0],
-                pubkey_y: localStorage.getItem('pubkey').split(',')[1],
-                nullifier: localStorage.getItem('identityNullifier'),
-				trapdoor: localStorage.getItem('identityTrapdoor'),
-				privkey: localStorage.getItem('privkey'),
-                data_hash: "",
-                recipient: "",
+                pubkey_x: null,
+                pubkey_y: null,
+                nullifier: null,
+				trapdoor: null,
+				privkey: null,
+                data_hash: null,
+                recipient: null,
 				// circuit: null,
                 // provingKey: null,
-                p: null
             }	
         },
 
