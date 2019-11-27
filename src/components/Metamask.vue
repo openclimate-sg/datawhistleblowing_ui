@@ -1,5 +1,6 @@
 <template>
   <div class="metamask-info" align="left">
+	  <br/>
     <p>
       <strong>Metamask:</strong>
       {{ web3.isInjected }}
@@ -33,7 +34,8 @@ export default {
 <style scoped>
 .metamask-info {
   width: 100%;
-  padding-left: 20%; 
+  padding-left: 15%; 
   /* margin-left: -300px; */
+  font-size: 80%
 }
 </style>
