@@ -36,10 +36,6 @@ export const store = new Vuex.Store({
             state.contractInstance = () => payload
             // state.contractInstance = payload
         },
-
-        // registerProvingKey(state, payload){
-        //     state.provingKey = () => payload
-        // }
            
     },
     actions: {
@@ -65,16 +61,5 @@ export const store = new Vuex.Store({
             }).catch(e => console.log(e))
         },
 
-        // loadProvingKey ({commit}) {
-        //     axios.get("https://github.com/therealyingtong/rollupnc_ui/blob/master/src/assets/proving_key.bin")
-        //     .then( (response) => {
-        //         console.log(response)
-        //         // console.log(response.arrayBuffer())
-        //         return response.arrayBuffer();
-        //     }).then( (b) => {
-        //         commit('registerProvingKey', b)
-        //         // this.provingKey = b;
-        //     })
-        // }
     }
 })

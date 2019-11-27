@@ -19,32 +19,28 @@ const buildWitness = require("../libraries/buildwitness")
 const {unstringifyBigInts} = require("../libraries/stringifybigint.js");
 const libsemaphore = require('libsemaphore')
 
-// import {
-//     SnarkProvingKey,
-//     SnarkVerifyingKey,
-//     parseVerifyingKeyJson,
-//     genExternalNullifier,
-//     genCircuit,
-//     Identity,
-//     genIdentity,
-//     genIdentityCommitment,
-//     genWitness,
-//     genProof,
-//     genPublicSignals,
-//     verifyProof,
-//     formatForVerifierContract,
-// } from 'libsemaphore'
 
 module.exports = {
 
-	blowWhistle: async function(contractInstance, circuit, provingKey, WHISTLEBLOWER_REWARD_ADDRESS, identity, externalNullifier){
+	formatIdentity: function(pubkey_x, pubkey_y, privKey, identityNullifier, identityTrapdoor){
+		return {
+			"keypair": {
+				"pubKey": [bigInt(pubkey_x), bigInt(pubkey_y)],
+				"privKey": Buffer.from(privKey)
+			},
+			"identityNullifier": bigInt(identityNullifier),
+			"identityTrapdoor": bigInt(identityTrapdoor)
+		}
+	},
+
+	blowWhistle: async function(leaves, circuit, provingKey, identity, externalNullifier){
 		const semaphoreTreeDepth = 12
 		const signal = ''
-		const leaves = await contractInstance.getIdentityCommitments()
+		var parsedCircuit = libsemaphore.genCircuit(circuit)
 
 		const result = await libsemaphore.genWitness(
 			signal,
-			circuit,
+			parsedCircuit,
 			identity,
 			leaves,
 			semaphoreTreeDepth,
@@ -57,16 +53,11 @@ module.exports = {
 		// const isValid = verifyProof(verifyingKey, proof, publicSignals)
 		const formatted = libsemaphore.formatForVerifierContract(proof, publicSignals)
 
-		const whistleblowTx = await contractInstance.blowWhistle(
-			WHISTLEBLOWER_REWARD_ADDRESS,
-			ethers.utils.toUtf8Bytes(signal),
-			formatted.a,
-			formatted.b,
-			formatted.c,
-			formatted.input,
-		)
-		const receipt = await whistleblowTx.wait()
-		// return receipt
+		return ethers.utils.toUtf8Bytes(signal),
+		formatted.a,
+		formatted.b,
+		formatted.c,
+		formatted.input
 	}
 
 }

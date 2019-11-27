@@ -1,62 +1,38 @@
 <template>
- <div class='withdraw-info' v-on:click="toggleHidden">
+ <div class='withdraw-info'>
      <h1 align="center"><strong>blow whistle</strong></h1>
      <b-container fluid v-if="!isHidden">
         <b-row class="my-1">
             <b-col sm="2">
-            <label for="input-small">from_x:</label><br/>
-            <label for="input-small">from_y:</label><br/>
-            <label for="input-small">nonce:</label><br/>
-            <label for="input-small">amount:</label><br/>
-            <label for="input-small">token:</label><br/>
+            <label for="input-small">pubkey_x:</label><br/>
+            <label for="input-small">pubkey_y:</label><br/>
+            <label for="input-small">trapdoor:</label><br/>
+            <label for="input-small">nullifier:</label><br/>
+			<label for="input-small">privkey:</label><br/>
+            <label for="input-small">dataHash:</label><br/>
             <label for="input-small">recipient:</label><br/>
-            <label for="input-small">txRoot:</label><br/>
             </b-col>
             <b-col sm="10">
-            <b-form-input id="input-small" v-model="from_x" size="sm"></b-form-input>
-            <b-form-input id="input-small" v-model="from_y" size="sm"></b-form-input>
-            <b-form-input id="input-small" v-model="nonce" size="sm"></b-form-input>
-            <b-form-input id="input-small" v-model="amount" size="sm"></b-form-input>
-            <b-form-input id="input-small" v-model="token_type_from" size="sm"></b-form-input>
+            <b-form-input id="input-small" v-model="pubkey_x" size="sm"></b-form-input>
+            <b-form-input id="input-small" v-model="pubkey_y" size="sm"></b-form-input>
+            <b-form-input id="input-small" v-model="trapdoor" size="sm"></b-form-input>
+            <b-form-input id="input-small" v-model="nullifier" size="sm"></b-form-input>
+			<b-form-input id="input-small" v-model="privkey" size="sm"></b-form-input>
+            <b-form-input id="input-small" v-model="data_hash" size="sm"></b-form-input>
             <b-form-input id="input-small" v-model="recipient" size="sm"></b-form-input>
-            <b-form-input id="input-small" v-model="txRoot" size="sm"></b-form-input>
             </b-col>
         </b-row>
     </b-container>
-    <div class="withdraw-button" v-if="!isHidden" v-on:click="toggleHidden">
-        <h5 v-on:click = "getMerkleProof"><strong>1. Get Merkle proof</strong></h5>
-     </div>
-     <div class="withdraw-button" v-if="!isHidden" v-on:click="toggleHidden">
-        <h5 v-on:click = "getSnarkProof"><strong>2. EdDSA sign</strong></h5>
-     </div>
      {{ p }}
-    <b-container fluid v-if="!isHidden" v-on:click="toggleHidden">
-        <b-row class="my-1">
-            <b-col sm="2">
-            <label for="input-small">a:</label><br/>
-            <label for="input-small">b:</label><br/>
-            <label for="input-small">c:</label><br/>
-            </b-col>
-            <b-col sm="10">
-            <b-form-input id="input-small" placeholder="calculating..." v-model="a"  size="sm"></b-form-input>
-            <b-form-input id="input-small" placeholder="calculating..." v-model="b" size="sm"></b-form-input>
-            <b-form-input id="input-small" placeholder="calculating..." v-model="c" size="sm"></b-form-input>
-            </b-col>
-        </b-row>
-    </b-container>
-    <div class="withdraw-button" v-if="!isHidden" v-on:click="toggleHidden">
-        <h5 v-on:click = "clickWithdraw"><strong>3. Submit to contract</strong></h5>
+    
+    <div class="withdraw-button" v-if="!isHidden" >
+        <h5 v-on:click = "clickWithdraw"><strong> submit to contract</strong></h5>
      </div>
 
     <div class="tx" v-if="withdrawTx" align = "left">
         <strong>Tx hash:</strong> <a :href ="'https://kovan.etherscan.io/tx/' + withdrawTx" target="_blank" style="color:#4682b4">{{ withdrawTx }}</a>
     </div>
-    <div v-if="withdrawEvent" align="left">
-        <strong>From (EdDSA):</strong> {{ withdrawEvent.from[0] }}, {{ withdrawEvent.from[1] }} <br/>
-        <strong>To (Ethereum):</strong> {{ withdrawEvent.recipient }} <br/>
-        <strong>Amount:</strong> {{ withdrawEvent.amount }} <br/>
-        <strong>Token type:</strong> {{ withdrawEvent.token_type }}
-    </div>
+
  </div>
 
 </template>
@@ -135,32 +111,23 @@
         },
         data () {
             return {
-                isHidden: true,
+                isHidden: false,
                 pendingTx: false,
                 pendingSign: false,
                 pendingEvent: false,
                 withdrawEvent: null,
                 withdrawTx: null,
-                from_x: "",
-                from_y: "",
-                nonce: "",
-                amount: "",
-                token_type_from: "",
-                proof: [],
-                position: [],
-                txRoot: "",
+                pubkey_x: localStorage.getItem('pubkey').split(',')[0],
+                pubkey_y: localStorage.getItem('pubkey').split(',')[1],
+                nullifier: localStorage.getItem('identityNullifier'),
+				trapdoor: localStorage.getItem('identityTrapdoor'),
+				privkey: localStorage.getItem('privkey'),
+                data_hash: "",
                 recipient: "",
-                a: null,
-                b: null,
-                c: null,
-				
 				circuit: null,
                 provingKey: null,
-                witness: null,
-                privkey: Buffer.from("2".padStart(64,'0'), "hex"),
-                // privkey: localStorage.getItem('privkey'),
                 p: null
-            }
+            }	
         },
 
         methods: {
@@ -169,50 +136,42 @@
                 .then( (response) => {
                     return response.arrayBuffer();
                 }).then( (b) => {
-                    this.provingKey = b;
+					this.provingKey = b;
+					console.log(this.provingKey)
                 })
             },
-
             loadCircuit () {
-                fetch(circuitURL)
+                fetch(circuitURL, {cache: 'no-store'})
                 .then( (response) => {
-                    return response.arrayBuffer();
+                    return response.json();
                 }).then( (b) => {
-                    this.circuit = JSON.parse(b).toString();
+					console.log('hi', b)
+					this.circuit = b;
                 })
             },
 
-            getSnarkProof ()  {
-                this.withdrawTx = null
-                this.withdrawEvent = null
-                this.pendingEvent = true
-                this.pendingTx = false
-                this.pendingSign = true
+            async clickWithdraw () {
 
-                // console.log('inputs to whistleHelper',
-                // this.nonce, this.recipient, [this.from_x, this.from_y], this.privkey)
-                // var snarkInputs = whistleHelper.signWithdrawMessage(
-                //     this.nonce, this.recipient, [this.from_x, this.from_y], this.privkey
-                // )
-                // this.witness = whistleHelper.calculateWitness(this.circuit, snarkInputs)
-                // window.genZKSnarkProof(this.witness, this.provingKey).then((p)=> {
-                //     this.p = p
-                //     console.log(p)
-                //     var call = whistleHelper.generateCall(p)
-                //     console.log("call", call)
-                //     this.a = call.a
-                //     this.b = call.b
-                //     this.c = call.c                
-                // })
-            },
+				this.pendingTx = true
+				const leaves = await this.$store.state.contractInstance().methods.getIdentityCommitments().call()
+					
+				await console.log(leaves)
+				const identity = await whistleHelper.formatIdentity(this.pubkey_x, this.pubkey_y, this.privkey, this.nullifier, this.trapdoor)
+				await console.log(identity)
+				var signal, a, b, c, input = await whistleHelper.blowWhistle(
+					leaves,
+					this.circuit,
+					this.provingKey,
+					identity,
+					this.data_hash
+				)
 
-            clickWithdraw () {
-                this.pendingTx = true
-                this.$store.state.contractInstance().methods.withdraw(
-                    [this.from_x, this.from_y], 
-                    [this.nonce, this.amount, this.token_type_from], 
-                    [this.position, this.proof], this.txRoot, this.recipient,
-                    this.a, this.b, this.c).send(
+				await console.log('signal, a, b, c, input', signal, a, b, c, input)
+
+                this.$store.state.contractInstance().methods.blowWhistle(
+					this.recipient,
+					signal, a, b, c, input
+					).send(
                     {
                         // gas: 300000,
                         from: this.$store.state.web3.coinbase
@@ -236,9 +195,6 @@
                     })
             },
 
-            getMerkleProof () {
-
-            },
 
             toggleHidden (){
                 this.isHidden = !this.isHidden

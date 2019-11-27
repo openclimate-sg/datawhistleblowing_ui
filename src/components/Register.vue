@@ -1,7 +1,7 @@
 <template>
- <div class='register-info' v-on:click="toggleHidden">
+ <div class='register-info'>
      <h1 align="center"><strong>register executive</strong></h1>
-     <b-container fluid v-if="!isHidden" v-on:click="toggleHidden">
+     <b-container fluid v-if="!isHidden">
         <b-row class="my-1">
             <b-col sm="2">
             <label for="input-small">pubkey_x:</label><br/>
@@ -100,7 +100,7 @@
         },
         data () {
             return {
-                isHidden: true,
+                isHidden: false,
                 pendingTx: false,
                 pendingEvent: false,
                 registerEvent: null,
