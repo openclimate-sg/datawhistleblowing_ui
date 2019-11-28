@@ -1,8 +1,8 @@
 # UI for datawhistleblowing
+- please find full write-up at https://github.com/openclimate-sg/whitepaper/wiki
+- please find smart contracts and zk-SNARK circuits at https://github.com/openclimate-sg/datawhistleblowing
 
 ## Overview
-(please find full write-up at https://github.com/openclimate-sg/whitepaper/wiki)
-
 For the purposes of this hackathon, we have implemented a simple proof of concept. We use as an example a solar energy farm which is required to report its daily power production. We also assume that this farm is a corporation with 5 executives.
 
 Each executive registers their cryptographic identity into an Ethereum smart contract (based on Semaphore (https://weijiekoh.github.io/semaphore-ui/, https://github.com/kobigurk/semaphore/), a zero-knowledge signalling gadget), so that anyone can anonymously prove their membership in the set and broadcast a whistleblowing signal.
