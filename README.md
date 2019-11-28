@@ -1,6 +1,7 @@
 # UI for datawhistleblowing
 - please find full write-up at https://github.com/openclimate-sg/whitepaper/wiki
 - please find smart contracts and zk-SNARK circuits at https://github.com/openclimate-sg/datawhistleblowing
+- to interact with the main contract, `DataReporting.sol`, you can directly use the etherscan interface at https://kovan.etherscan.io/address/0x7B591C58f19292cE068b83375c470744B3a7eab1#writeContract
 
 ## Overview
 For the purposes of this hackathon, we have implemented a simple proof of concept. We use as an example a solar energy farm which is required to report its daily power production. We also assume that this farm is a corporation with 5 executives.
